@@ -25,7 +25,7 @@
         /* Scrollable opening section */
         .opening {
             position: relative;
-            height: 10vh;
+            height: 200vh;
         }
 
         /* Stays fixed in view while scrolling through opening */
@@ -138,7 +138,7 @@
                 `translate(-50%, calc(-50% + ${moveY}vh))`;
 
             // Fade out the envelope only
-            envelope.style.opacity = 2 - progress;
+            envelope.style.opacity = 1 - progress;
 
             ticking = false;
         }
@@ -160,10 +160,6 @@
 
         updateAnimation();
     </script>
-
-</body>
-</html>
-
 
 </body>
 </html>
