@@ -11,85 +11,62 @@
             box-sizing: border-box;
         }
 
-        html {
+        html, body {
             margin: 0;
             padding: 0;
             width: 100%;
-            overflow-x: clip;
-            background: #f5f0e8;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-            overflow-x: clip;
             background: #f5f0e8;
+            overflow-x: hidden;
         }
 
-        /*
-          Fixed background layer.
-          This is separate from the scrolling section.
-        */
-        .background-layer {
+        /* Scrollable opening section */
+        .opening {
+            position: relative;
+            height: 200vh;
+        }
+
+        /* Stays fixed in view while scrolling through opening */
+        .scene {
             position: fixed;
-            inset: 0;
+            top: 0;
             width: 100%;
             height: 100vh;
-            height: 100dvh;
+            height: 100svh;
             overflow: hidden;
-            z-index: 0;
-            background: #f5f0e8;
-            pointer-events: none;
+            isolation: isolate;
         }
 
+        /* Single image: table + invitation card */
         .background {
-            display: block;
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
             object-position: center;
-        }
-
-        /*
-          Creates the scroll distance for the animation.
-        */
-        .opening {
-            position: relative;
-            height: 200vh;
-            height: 200svh;
             z-index: 1;
         }
 
-        /*
-          Envelope layer stays over the background.
-        */
-        .envelope-layer {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            overflow: hidden;
-            z-index: 2;
-            pointer-events: none;
-        }
-
+        /* Separate transparent envelope image */
         .envelope {
             position: absolute;
+            z-index: 2;
             width: min(76vw, 480px);
             height: 90%;
             left: 50%;
             top: 50%;
             object-fit: contain;
             object-position: center;
-            transform: translate3d(-50%, -50%, 0);
+            transform: translate(-50%, -50%);
             opacity: 1;
             will-change: transform, opacity;
+            pointer-events: none;
         }
 
-        /* Mobile screens */
+        /* Mobile layout */
         @media (max-width: 600px) {
             .envelope {
                 width: 92vw;
@@ -105,31 +82,37 @@
                 max-width: 75vw;
             }
         }
+
+        /* Respect reduced-motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Background image: table and invitation card together -->
-    <div class="background-layer">
-        <img
-            class="background"
-            src="background.png"
-            alt=""
-        >
-    </div>
+    <main class="opening">
+        <section class="scene">
 
-    <!-- Scroll distance -->
-    <main class="opening"></main>
+            <!-- This image includes BOTH the table and invitation card -->
+            <img
+                class="background"
+                src="background.png"
+                alt=""
+            >
 
-    <!-- Only the envelope is animated -->
-    <div class="envelope-layer">
-        <img
-            class="envelope"
-            src="envelope.png"
-            alt=""
-        >
-    </div>
+            <!-- Only the envelope moves and fades out -->
+            <img
+                class="envelope"
+                src="envelope.png"
+                alt=""
+            >
+
+        </section>
+    </main>
 
     <script>
         const opening = document.querySelector(".opening");
@@ -138,46 +121,42 @@
         let ticking = false;
 
         function updateAnimation() {
-            const maxScroll = Math.max(
-                1,
-                opening.offsetHeight - window.innerHeight
-            );
+            const rect = opening.getBoundingClientRect();
+            const scrollDistance =
+                opening.offsetHeight - window.innerHeight;
 
-            const progress = Math.max(
-                0,
-                Math.min(1, window.scrollY / maxScroll)
-            );
+            let progress = scrollDistance > 0
+                ? -rect.top / scrollDistance
+                : 0;
 
-            /*
-              Move the envelope upward and fade it out.
-              The background is never changed by this animation.
-            */
-            const viewportHeight = window.innerHeight;
-            const moveY = -progress * viewportHeight * 1.3;
+            progress = Math.max(0, Math.min(1, progress));
+
+            // Move the envelope upward as the visitor scrolls
+            const moveY = progress * -130;
 
             envelope.style.transform =
-                `translate3d(-50%, calc(-50% + ${moveY}px), 0)`;
+                `translate(-50%, calc(-50% + ${moveY}vh))`;
 
-            envelope.style.opacity = String(1 - progress);
+            // Fade out the envelope only
+            envelope.style.opacity = 1 - progress;
 
             ticking = false;
         }
 
-        function requestUpdate() {
+        function requestAnimationUpdate() {
             if (!ticking) {
-                ticking = true;
                 window.requestAnimationFrame(updateAnimation);
+                ticking = true;
             }
         }
 
         window.addEventListener(
             "scroll",
-            requestUpdate,
+            requestAnimationUpdate,
             { passive: true }
         );
 
-        window.addEventListener("resize", requestUpdate);
-        window.addEventListener("orientationchange", requestUpdate);
+        window.addEventListener("resize", requestAnimationUpdate);
 
         updateAnimation();
     </script>
