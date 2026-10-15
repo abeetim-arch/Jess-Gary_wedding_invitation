@@ -11,38 +11,49 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
+            min-height: 100%;
+        }
+
+        html {
+            overflow-x: clip;
         }
 
         body {
             background: #f5f0e8;
-            overflow-x: hidden;
+            overflow-x: clip;
         }
 
-        /* Scrollable opening section */
+        /*
+          The section provides the scroll distance.
+          The scene stays fixed while the envelope animates.
+        */
         .opening {
             position: relative;
             height: 200vh;
+            height: 200svh;
         }
 
-        /* Stays fixed in view while scrolling through opening */
         .scene {
             position: fixed;
-            top: 0;
+            inset: 0;
             width: 100%;
             height: 100vh;
             height: 100svh;
             overflow: hidden;
             isolation: isolate;
+            background: #f5f0e8;
         }
 
-        /* Single image: table + invitation card */
+        /* One background image containing the table and card */
         .background {
             position: absolute;
             inset: 0;
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -50,7 +61,7 @@
             z-index: 1;
         }
 
-        /* Separate transparent envelope image */
+        /* The only element that moves and fades */
         .envelope {
             position: absolute;
             z-index: 2;
@@ -66,7 +77,6 @@
             pointer-events: none;
         }
 
-        /* Mobile layout */
         @media (max-width: 600px) {
             .envelope {
                 width: 92vw;
@@ -74,19 +84,11 @@
             }
         }
 
-        /* Landscape phones */
         @media (max-height: 500px) {
             .envelope {
                 height: 88%;
                 width: auto;
                 max-width: 75vw;
-            }
-        }
-
-        /* Respect reduced-motion preferences */
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
             }
         }
     </style>
@@ -97,14 +99,14 @@
     <main class="opening">
         <section class="scene">
 
-            <!-- This image includes BOTH the table and invitation card -->
+            <!-- Background includes the table AND invitation card -->
             <img
                 class="background"
                 src="background.png"
                 alt=""
             >
 
-            <!-- Only the envelope moves and fades out -->
+            <!-- Separate transparent envelope -->
             <img
                 class="envelope"
                 src="envelope.png"
@@ -121,23 +123,25 @@
         let ticking = false;
 
         function updateAnimation() {
-            const rect = opening.getBoundingClientRect();
             const scrollDistance =
                 opening.offsetHeight - window.innerHeight;
 
-            let progress = scrollDistance > 0
-                ? -rect.top / scrollDistance
+            const scrolled = Math.max(
+                0,
+                Math.min(scrollDistance, window.scrollY)
+            );
+
+            const progress = scrollDistance > 0
+                ? scrolled / scrollDistance
                 : 0;
 
-            progress = Math.max(0, Math.min(1, progress));
-
-            // Move the envelope upward as the visitor scrolls
-            const moveY = progress * -130;
+            // Move upward by 130% of the current viewport height
+            const moveY = -progress * window.innerHeight * 1.3;
 
             envelope.style.transform =
-                `translate(-50%, calc(-50% + ${moveY}vh))`;
+                `translate(-50%, calc(-50% + ${moveY}px))`;
 
-            // Fade out the envelope only
+            // Fade the envelope away; never fade the background
             envelope.style.opacity = 1 - progress;
 
             ticking = false;
@@ -145,8 +149,8 @@
 
         function requestAnimationUpdate() {
             if (!ticking) {
-                window.requestAnimationFrame(updateAnimation);
                 ticking = true;
+                window.requestAnimationFrame(updateAnimation);
             }
         }
 
@@ -156,7 +160,15 @@
             { passive: true }
         );
 
-        window.addEventListener("resize", requestAnimationUpdate);
+        window.addEventListener(
+            "resize",
+            requestAnimationUpdate
+        );
+
+        window.addEventListener(
+            "orientationchange",
+            requestAnimationUpdate
+        );
 
         updateAnimation();
     </script>
