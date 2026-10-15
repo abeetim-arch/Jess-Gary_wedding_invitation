@@ -1,595 +1,165 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Our Wedding</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation</title>
 
     <style>
-
-        /* =========================================
-           GENERAL
-        ========================================= */
-
         * {
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
         }
 
         body {
-            margin: 0;
-
-            background: #535e41;
-
-            color: #2c2926;
-
-            font-family: Georgia, serif;
+            background: #f5f0e8;
+            overflow-x: hidden;
         }
 
-
-        /* =========================================
-           OPENING AREA
-        ========================================= */
-
+        /* Scrollable opening section */
         .opening {
-    height: 180vh;
-    position: relative;
-}
+            position: relative;
+            height: 200vh;
+        }
 
-
-        /* =========================================
-           STICKY ANIMATION AREA
-        ========================================= */
-
-        .photo-section {
-
+        /* Stays fixed in view while scrolling through opening */
+        .scene {
             position: sticky;
-
             top: 0;
-
+            width: 100%;
             height: 100vh;
-
+            height: 100svh;
             overflow: hidden;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
+            isolation: isolate;
         }
 
-
-        /* =========================================
-           PHOTO
-        ========================================= */
-
-        .photo {
-
+        /* Single image: table + invitation card */
+        .table-background {
             position: absolute;
-
-            width: 100vw;
-
-            height: 100vh;
-
-            background-image:
-                url("wedding-photo.jpg");
-
-            background-size: cover;
-
-            background-position: center;
-
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
             z-index: 1;
-
-            opacity: 1;
-
-            will-change: opacity;
         }
 
-
-        /* =========================================
-           WEDDING DETAILS
-
-           This is NOT part of the frame.
-
-           It sits on top of the photograph and
-           fades in near the end of the animation.
-        ========================================= */
-
-        .wedding-details {
-
+        /* Separate transparent envelope image */
+        .envelope {
             position: absolute;
-
             z-index: 2;
-
-            left: 8%;
-
-            right: 8%;
-
+            width: min(76vw, 480px);
+            height: 82%;
+            left: 50%;
             top: 50%;
-
-            transform: translateY(-50%);
-
-            text-align: center;
-
-            color: white;
-
-            opacity: 0;
-
-            text-shadow:
-                0 2px 15px rgba(0,0,0,0.55);
-
-            will-change: opacity;
-
+            object-fit: contain;
+            object-position: center;
+            transform: translate(-50%, -50%);
+            opacity: 1;
+            will-change: transform, opacity;
             pointer-events: none;
         }
 
-
-        .wedding-details h2 {
-
-            margin: 0 0 30px;
-
-            font-size:
-                clamp(42px, 8vw, 75px);
-
-            font-weight: normal;
-        }
-
-
-        .wedding-details p {
-
-            max-width: 600px;
-
-            margin: 20px auto;
-
-            font-size: 19px;
-
-            line-height: 1.8;
-        }
-
-
-        .wedding-details .date {
-
-            font-weight: bold;
-
-            font-size: 21px;
-
-            margin-top: 30px;
-        }
-
-
-        /* =========================================
-           YOUR CUSTOM FRAME
-        ========================================= */
-
-        .frame {
-
-            position: absolute;
-
-            width: 100vw;
-
-            height: 100vh;
-
-            background-image:
-                url("wedding-frame.png");
-
-            background-size: cover;
-
-            background-position: center;
-
-            background-repeat: no-repeat;
-
-            z-index: 3;
-
-            pointer-events: none;
-
-            will-change: transform;
-        }
-
-
-        /* =========================================
-           JESS & GARY
-
-           This belongs to the FRAME.
-
-           Therefore it moves away together with
-           the frame.
-
-           Position this wherever the text should
-           appear underneath your cutout.
-        ========================================= */
-
-    .frame-names {
-    position: absolute;
-
-    z-index: 4;
-
-    left: 10%;
-    right: 10%;
-
-    top: 5%;
-
-    text-align: center;
-
-    color: white;
-
-    text-shadow:
-        0 2px 15px rgba(0,0,0,0.6);
-
-    pointer-events: none;
-
-    will-change: transform, opacity;
-}
-
-
-.frame-names h1 {
-    margin: 0;
-
-    font-size:
-        clamp(45px, 9vw, 90px);
-
-    font-weight: normal;
-
-    font-family: Playball;
-
-}
-
-
-.frame-names p {
-    margin-top: 100%;
-
-    font-size: 20px;
-
-    letter-spacing: 5px;
-
-    text-transform: uppercase;
-}
-
-        /* =========================================
-           CONTENT AFTER OPENING
-        ========================================= */
-
-        .content {
-
-            min-height: 120vh;
-
-            padding:
-                120px 25px;
-
-            text-align: center;
-
-            background: #f5f1eb;
-        }
-
-
-        .content h2 {
-
-            margin: 0 0 30px;
-
-            font-size:
-                clamp(42px, 8vw, 75px);
-
-            font-weight: normal;
-        }
-
-
-        .content p {
-
-            max-width: 600px;
-
-            margin: 20px auto;
-
-            font-size: 19px;
-
-            line-height: 1.8;
-        }
-
-
-        /* =========================================
-           MOBILE
-        ========================================= */
-
+        /* Mobile layout */
         @media (max-width: 600px) {
-
-            .opening {
-                height: 170vh;
-            }
-
-
-            .wedding-details {
-
-                left: 7%;
-
-                right: 7%;
-            }
-
-
-            .wedding-details h2 {
-
-                font-size: 48px;
-
-                margin-bottom: 20px;
-            }
-
-
-            .wedding-details p {
-
-                font-size: 17px;
-
-                line-height: 1.65;
-            }
-
-
-            .wedding-details .date {
-
-                font-size: 19px;
-            }
-
-
-            .frame-names {
-
-                left: 7%;
-
-                right: 7%;
-
-                bottom: 10%;
-            }
-
-
-            .frame-names h1 {
-
-                font-size: 48px;
-            }
-
-
-            .frame-names p {
-
-                font-size: 12px;
-
-                letter-spacing: 3px;
+            .envelope {
+                width: 92vw;
+                height: 78%;
             }
         }
 
+        /* Landscape phones */
+        @media (max-height: 500px) {
+            .envelope {
+                height: 88%;
+                width: auto;
+                max-width: 75vw;
+            }
+        }
+
+        /* Respect reduced-motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+        }
     </style>
-
 </head>
-
 
 <body>
 
+    <main class="opening">
+        <section class="scene">
 
-    <!-- =========================================
-         OPENING
-    ========================================= -->
+            <!-- This image includes BOTH the table and invitation card -->
+            <img
+                class="table-background"
+                src="table-background.jpg"
+                alt=""
+            >
 
-    <section class="opening">
+            <!-- Only the envelope moves and fades out -->
+            <img
+                class="envelope"
+                src="envelope.png"
+                alt=""
+            >
 
-
-        <div class="photo-section">
-
-
-            <!-- =================================
-                 PHOTO
-            ================================== -->
-
-            <div class="photo"></div>
-
-
-            <!-- =================================
-                 WEDDING DETAILS
-
-                 This stays on the photograph.
-
-                 It fades in after the frame is
-                 almost completely gone.
-            ================================== -->
-
-            <div class="wedding-details">
-
-                <h2>
-                    Our Wedding
-                </h2>
-
-
-                <p>
-                    We would love for you to join us
-                    as we celebrate our wedding day.
-                </p>
-
-
-                <p class="date">
-                    2027 - 05 - 29
-                </p>
-
-
-                <p>
-                    Toronto, Canada
-                </p>
-
-
-                <p>
-                    Hotel link/info: 
-                </p>
-
-
-                <p>
-                    More details coming soon.
-                </p>
-
-            </div>
-
-
-            <!-- =================================
-                 FRAME
-
-                 This moves upward.
-            ================================== -->
-
-            <div class="frame"></div>
-
-
-            <!-- =================================
-                 NAMES ON THE FRAME
-
-                 This moves upward together with
-                 the frame.
-            ================================== -->
-
-            <div class="frame-names">
-
-                <h1>
-                    Save the date
-                </h1>
-
-                <p>
-                    Jessica's & Gary's wedding
-                </p>
-
-            </div>
-
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================
-         CONTENT AFTER OPENING
-    ========================================= -->
-
- 
-    <!-- =========================================
-         ANIMATION
-    ========================================= -->
+        </section>
+    </main>
 
     <script>
+        const opening = document.querySelector(".opening");
+        const envelope = document.querySelector(".envelope");
 
-        const opening =
-            document.querySelector(".opening");
+        let ticking = false;
 
-        const frame =
-            document.querySelector(".frame");
+        function updateAnimation() {
+            const rect = opening.getBoundingClientRect();
+            const scrollDistance =
+                opening.offsetHeight - window.innerHeight;
 
-        const frameNames =
-            document.querySelector(".frame-names");
+            let progress = scrollDistance > 0
+                ? -rect.top / scrollDistance
+                : 0;
 
-        const photo =
-            document.querySelector(".photo");
+            progress = Math.max(0, Math.min(1, progress));
 
-        const weddingDetails =
-            document.querySelector(".wedding-details");
+            // Move the envelope upward as the visitor scrolls
+            const moveY = progress * -130;
 
+            envelope.style.transform =
+                `translate(-50%, calc(-50% + ${moveY}vh))`;
 
-        window.addEventListener("scroll", () => {
+            // Fade out the envelope only
+            envelope.style.opacity = 1 - progress;
 
+            ticking = false;
+        }
 
-            /* =====================================
-               SCROLL PROGRESS
-            ===================================== */
+        function requestAnimationUpdate() {
+            if (!ticking) {
+                window.requestAnimationFrame(updateAnimation);
+                ticking = true;
+            }
+        }
 
-            const rect =
-                opening.getBoundingClientRect();
+        window.addEventListener(
+            "scroll",
+            requestAnimationUpdate,
+            { passive: true }
+        );
 
+        window.addEventListener("resize", requestAnimationUpdate);
 
-            let progress =
-                -rect.top /
-                (opening.offsetHeight -
-                 window.innerHeight);
-
-
-            progress =
-                Math.max(
-                    0,
-                    Math.min(1, progress)
-                );
-
-
-            /* =====================================
-               MOVE FRAME
-
-               The frame AND Jess & Gary move
-               upward together.
-            ===================================== */
-
-            const frameY =
-                progress * -120;
-
-
-            frame.style.transform =
-                `translateY(${frameY}vh)`;
-
-
-            frameNames.style.transform =
-                `translateY(${frameY}vh)`;
-
-            const namesOpacity = 0.5 - progress;
-
-            frameNames.style.opacity = namesOpacity;
-
-
-            /* =====================================
-               FINAL TRANSITION
-
-               Start when roughly 10% of the
-               frame is still visible.
-            ===================================== */
-
-            const fadeStart = 0.70;
-
-
-            let fadeProgress =
-                (progress - fadeStart) /
-                (1 - fadeStart);
-
-
-            fadeProgress =
-                Math.max(
-                    0,
-                    Math.min(1, fadeProgress)
-                );
-
-
-            /* =====================================
-               FADE PHOTO
-
-               100% → 50%
-            ===================================== */
-
-            photo.style.opacity =
-                1 - (fadeProgress * 0.7);
-
-
-            /* =====================================
-               FADE WEDDING DETAILS
-
-               0% → 100%
-            ===================================== */
-
-            weddingDetails.style.opacity =
-                fadeProgress;
-
-        });
-
-        if (progress >= 1) {
-    weddingDetails.style.opacity = 1;
-    photo.style.opacity = 0.5;
-    frame.style.transform = `translateY(-120vh)`;
-    frameNames.style.transform = `translateY(-120vh)`;
-}
-
+        updateAnimation();
     </script>
 
-
 </body>
-
 </html>
